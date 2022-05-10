@@ -1,7 +1,10 @@
 # Youtube-Video-Downloader-with-GUI
-You need to install pytube module:
+This application uses the pytube module to download videos
+
+To install:
+
 pip install pytube
 
-This software uses the tkinter module as the GUI module that is pre-installed
+This application uses the tkinter module as the GUI module that is pre-installed
 
 Python version:3.9.7
