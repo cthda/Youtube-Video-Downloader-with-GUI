@@ -8,3 +8,7 @@ pip install pytube
 This application uses the tkinter module as the GUI module that is pre-installed
 
 Python version:3.9.7
+
+# Note:
+
+If you are using the older pytube module,you need to upgrade it to the last version
