@@ -11,6 +11,6 @@ Python version:3.9.7
 
 # Note:
 
-If you are using the older pytube module,you need to upgrade it to the last version
+If you have the older pytube module,you need to upgrade it to the last version
 
 Otherwise it does not work
