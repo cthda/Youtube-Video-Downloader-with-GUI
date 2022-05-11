@@ -52,13 +52,13 @@ class MainWindow(tk.Tk):
 
         self.connect_button.flash()
 
-        self.result = call(["ping","www.youtube.com"],shell=True)
+        result = call(["ping","www.youtube.com"],shell=True)
 
-        if self.result == 0:
+        if result == 0:
 
-            self.downloading_window = DownloadingWindow(self)
+            downloading_window = DownloadingWindow(self)
 
-            self.downloading_window.start_downloading_window()
+            downloading_window.start_downloading_window()
 
         else:
 
@@ -118,12 +118,12 @@ class DownloadingWindow(tk.Toplevel):
 
     def __create_resolution_combobox(self):
 
-        self.resolution_list = ("360p","480p","720p")
+        resolution_list = ("360p","480p","720p")
 
         self.resolution_menu = ttk.Combobox(
         self,
         textvariable=self.resolution,
-        values=self.resolution_list,
+        values=resolution_list,
         state="readonly",
         foreground="white",
         font=("Courier",10,"bold","italic")
@@ -179,7 +179,7 @@ class DownloadingWindow(tk.Toplevel):
 
             self.url_entry.delete(0,"end")
 
-            self.url_entry.unbind("<Button-1>",self.id)
+            self.url_entry.unbind("<Button-1>",id)
 
         self.url_entry = tk.Entry(
         self,
@@ -202,7 +202,7 @@ class DownloadingWindow(tk.Toplevel):
 
         self.url_entry.configure(state="disabled",disabledforeground="white")
 
-        self.id = self.url_entry.bind("<Button-1>",placeholder)
+        id = self.url_entry.bind("<Button-1>",placeholder)
 
     def __create_location_of_folder_entry(self):
 
@@ -244,9 +244,9 @@ class DownloadingWindow(tk.Toplevel):
 
     def __after_click_on_browse_button(self):
 
-        self.folder = dir.askdirectory(title="Folder Of MP4-MP3 Files Which To Be Downloaded")
+        folder = dir.askdirectory(title="Folder Of MP4-MP3 Files Which To Be Downloaded")
 
-        self.location_of_folder.set(self.folder)
+        self.location_of_folder.set(folder)
 
     def __create_download_button(self):
 
@@ -310,61 +310,59 @@ class DownloadingWindow(tk.Toplevel):
 
     def mp4_to_mp3(self,mp4_file:str,mp3_file:str):
 
-        self.video = VideoFileClip(mp4_file)
+        video = VideoFileClip(mp4_file)
 
-        self.mp4_audio = self.video.audio
+        mp4_audio = video.audio
 
-        self.mp4_audio.write_audiofile(mp3_file)
+        mp4_audio.write_audiofile(mp3_file)
 
-        self.video.close()
+        video.close()
 
-        self.mp4_audio.close()
+        mp4_audio.close()
 
     def __eliminate_wrong_character(self,path_of_downloaded_file):   #This is for not getting error because of the character while downloading
 
-        self.path_of_downloaded_file = path_of_downloaded_file
+        eliminate_character = r"\n"
 
-        self.eliminate_character = r"\n"
+        eliminate_character = eliminate_character.strip("n")
 
-        self.eliminate_character = self.eliminate_character.strip("n")
+        without_wrong_character = path_of_downloaded_file.split(eliminate_character)
 
-        self.without_wrong_character = self.path_of_downloaded_file.split(self.eliminate_character)
+        without_wrong_character.reverse()
 
-        self.without_wrong_character.reverse()
+        without_wrong_character_list = without_wrong_character[0].split(".")
 
-        self.without_wrong_character_list = self.without_wrong_character[0].split(".")
+        without_wrong_character_list.pop()
 
-        self.without_wrong_character_list.pop()
+        path_of_downloaded_file_without_wrong_character = "".join(without_wrong_character_list)
 
-        self.path_of_downloaded_file_without_wrong_character = "".join(self.without_wrong_character_list)
-
-        return self.path_of_downloaded_file_without_wrong_character   
+        return path_of_downloaded_file_without_wrong_character   
 
     def __download(self):
 
         def progress_bar_percent(stream,chunk,bytes_remaining):
 
-            size_of_file = self.streams.filesize
+            size_of_file = streams.filesize
 
             downloaded_byte = size_of_file - bytes_remaining
 
             percent = int(downloaded_byte / size_of_file * 100)
 
-            self.pb["value"] = percent
+            pb["value"] = percent
 
             self.update()
 
-        self.pb = ttk.Progressbar(self,orient="horizontal", length=285, mode="determinate",style="red.Horizontal.TProgressbar")
+        pb = ttk.Progressbar(self,orient="horizontal", length=285, mode="determinate",style="red.Horizontal.TProgressbar")
 
-        self.mini_info_window = True
+        mini_info_window = True
 
         self.download_button.configure(text="Downloading",state="disabled")
 
-        self.mp3_mp4_control = self.__mp3_mp4()
+        mp3_mp4_control = self.__mp3_mp4()
 
         try:
 
-            self.yt = YouTube(self.url.get(),progress_bar_percent)
+            yt = YouTube(self.url.get(),progress_bar_percent)
 
         except:
 
@@ -374,29 +372,29 @@ class DownloadingWindow(tk.Toplevel):
 
         else:
 
-            self.stream_filter = self.yt.streams.filter(progressive=True,file_extension="mp4")
+            stream_filter = yt.streams.filter(progressive=True,file_extension="mp4")
 
-            self.streams = self.stream_filter.get_by_resolution(self.resolution.get())
+            streams = stream_filter.get_by_resolution(self.resolution.get())
 
-            if self.mp3_mp4_control == 1 and self.streams == None:
+            if mp3_mp4_control == 1 and streams == None:
 
-                self.mp3_download_resolution_problem = ("720p","480p","360p")
+                mp3_download_resolution_problem = ("720p","480p","360p")
 
-                self.index = 0
+                index = 0
 
-                while self.streams == None:
+                while streams == None:
 
-                    if self.streams == None and self.index == len(self.mp3_download_resolution_problem):
+                    if streams == None and index == len(mp3_download_resolution_problem):
 
                         messagebox.showerror("MP3 Download Error","MP3 file cannot be downloaded")
 
                         break
 
-                    self.streams = self.stream_filter.get_by_resolution(self.resolution.set(self.mp3_download_resolution_problem[self.index]))
+                    streams = stream_filter.get_by_resolution(self.resolution.set(mp3_download_resolution_problem[index]))
 
-                    self.index += 1
+                    index += 1
 
-            if self.streams == None:
+            if streams == None:
 
                 messagebox.showerror("Downloading Error","There is no video that has audio-video combination tracks at this resolution")
 
@@ -404,57 +402,57 @@ class DownloadingWindow(tk.Toplevel):
 
             else:
 
-                if (self.mp3_mp4_control == 0) and (self.location_of_folder.get().upper().startswith("C") or self.location_of_folder.get().upper().startswith("D") or self.location_of_folder.get().startswith("/")) == True:
+                if (mp3_mp4_control == 0) and (self.location_of_folder.get().upper().startswith("C") or self.location_of_folder.get().upper().startswith("D") or self.location_of_folder.get().startswith("/")) == True:
 
-                    messagebox.showinfo("Downloading",f"Downloading {self.yt.title} mp4 and mp3 files...\nLocation to install:{self.location_of_folder.get()}")
+                    messagebox.showinfo("Downloading",f"Downloading {yt.title} mp4 and mp3 files...\nLocation to install:{self.location_of_folder.get()}")
 
-                    self.pb.place_configure(x=106,y=382)
+                    pb.place_configure(x=106,y=382)
 
-                    self.path = self.streams.download(self.location_of_folder.get())
+                    path = streams.download(self.location_of_folder.get())
 
-                    self.pb.destroy()
+                    pb.destroy()
 
-                    self.path_without_error = self.__eliminate_wrong_character(self.path)
+                    path_without_error = self.__eliminate_wrong_character(path)
 
-                    self.mp4_file = f"{self.location_of_folder.get()}/" + f"{self.path_without_error}.mp4"
+                    mp4_file = f"{self.location_of_folder.get()}/" + f"{path_without_error}.mp4"
 
-                    self.mp3_file = f"{self.location_of_folder.get()}/" + f"{self.path_without_error}.mp3"
-
-                    self.download_button.configure(text="Download",state="normal")
-
-                    self.mp4_to_mp3(self.mp4_file,self.mp3_file)
-
-                elif (self.mp3_mp4_control == 1) and (self.location_of_folder.get().upper().startswith("C") or self.location_of_folder.get().upper().startswith("D") or self.location_of_folder.get().startswith("/")) == True:
-
-                    messagebox.showinfo("Downloading",f"Downloading {self.yt.title} mp3 file...\nLocation to install:{self.location_of_folder.get()}")
-
-                    self.pb.place_configure(x=106,y=382)
-
-                    self.path = self.streams.download(self.location_of_folder.get())
-
-                    self.pb.destroy()
-
-                    self.path_without_error = self.__eliminate_wrong_character(self.path)
-
-                    self.mp4_file = f"{self.location_of_folder.get()}/" + f"{self.path_without_error}.mp4"
-
-                    self.mp3_file = f"{self.location_of_folder.get()}/" + f"{self.path_without_error}.mp3"
+                    mp3_file = f"{self.location_of_folder.get()}/" + f"{path_without_error}.mp3"
 
                     self.download_button.configure(text="Download",state="normal")
 
-                    self.mp4_to_mp3(self.mp4_file,self.mp3_file)
+                    self.mp4_to_mp3(mp4_file,mp3_file)
 
-                    os.remove(self.mp4_file)
+                elif (mp3_mp4_control == 1) and (self.location_of_folder.get().upper().startswith("C") or self.location_of_folder.get().upper().startswith("D") or self.location_of_folder.get().startswith("/")) == True:
 
-                elif (self.mp3_mp4_control == 2) and (self.location_of_folder.get().upper().startswith("C") or self.location_of_folder.get().upper().startswith("D") or self.location_of_folder.get().startswith("/")) == True:
+                    messagebox.showinfo("Downloading",f"Downloading {yt.title} mp3 file...\nLocation to install:{self.location_of_folder.get()}")
 
-                    messagebox.showinfo("Downloading",f"Downloading {self.yt.title} mp4 file...\nLocation to install:{self.location_of_folder.get()}")
+                    pb.place_configure(x=106,y=382)
 
-                    self.pb.place_configure(x=106,y=382)
+                    path = streams.download(self.location_of_folder.get())
 
-                    self.streams.download(self.location_of_folder.get())
+                    pb.destroy()
 
-                    self.pb.destroy()
+                    path_without_error = self.__eliminate_wrong_character(path)
+
+                    mp4_file = f"{self.location_of_folder.get()}/" + f"{path_without_error}.mp4"
+
+                    mp3_file = f"{self.location_of_folder.get()}/" + f"{path_without_error}.mp3"
+
+                    self.download_button.configure(text="Download",state="normal")
+
+                    self.mp4_to_mp3(mp4_file,mp3_file)
+
+                    os.remove(mp4_file)
+
+                elif (mp3_mp4_control == 2) and (self.location_of_folder.get().upper().startswith("C") or self.location_of_folder.get().upper().startswith("D") or self.location_of_folder.get().startswith("/")) == True:
+
+                    messagebox.showinfo("Downloading",f"Downloading {yt.title} mp4 file...\nLocation to install:{self.location_of_folder.get()}")
+
+                    pb.place_configure(x=106,y=382)
+
+                    streams.download(self.location_of_folder.get())
+
+                    pb.destroy()
 
                     self.download_button.configure(text="Download",state="normal")
 
@@ -464,15 +462,15 @@ class DownloadingWindow(tk.Toplevel):
 
                     self.download_button.configure(text="Download",state="normal")
 
-                    self.mini_info_window = False
+                    mini_info_window = False
 
-                if self.mp3_mp4_control < 3 and self.mini_info_window == True:
+                if mp3_mp4_control < 3 and mini_info_window == True:
 
-                    self.show = messagebox.askyesno(message="Do you want to see video's information?")
+                    show = messagebox.askyesno(message="Do you want to see video's information?")
 
-                    if self.show == True:
+                    if show == True:
 
-                        messagebox.showinfo("Video Info",f"Title: {self.yt.title}\nDescription: {self.yt.description}\nDuration: {self.yt.length} seconds\nPublished Date: {self.yt.publish_date}")
+                        messagebox.showinfo("Video Info",f"Title: {yt.title}\nDescription: {yt.description}\nDuration: {yt.length} seconds\nPublished Date: {yt.publish_date}")
 
 
 main_window = MainWindow()
